@@ -50,24 +50,29 @@
             z-index: 10;
         }
         
+        /* 🌟 가로 스크롤/줄바꿈 완벽 차단 및 가운데 정렬 */
         #block-selector {
             display: flex;
-            flex-wrap: wrap; 
-            justify-content: center; 
-            gap: 12px;
-            padding: 0 20px;
-            max-width: 100%;
+            flex-wrap: nowrap; /* 한 줄로 강제 고정 */
+            justify-content: center; /* 가운데 정렬 */
+            align-items: center;
+            gap: min(12px, 2vw); /* 화면이 좁아지면 간격도 유연하게 줄어듦 */
+            padding: 0 10px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden; /* 영역 밖으로 나가는 스와이프 완전 차단 */
         }
         .block-btn {
-            width: 55px;
-            height: 55px;
+            /* 🌟 모바일 화면에 맞춰 버튼 크기 자동 축소 (최소 35px ~ 최대 55px) */
+            width: clamp(35px, 14vw, 55px);
+            height: clamp(35px, 14vw, 55px);
             border: 2px solid #eaeaea;
             border-radius: 12px;
             background-size: cover;
             background-position: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            flex-shrink: 0;
+            flex-shrink: 1; /* 화면이 좁을 경우 줄어드는 것을 허용 */
             background-color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             -webkit-tap-highlight-color: transparent; 
@@ -411,15 +416,9 @@
         }
     }
 
-    // 🌟 1.5초 유예 시간을 갖도록 하드 드롭 수정
     function hardDrop() {
         if (!activeBlock || isGameOver) return;
-        
-        // 위치만 바닥(목표 지점)으로 즉시 이동시킵니다.
         activeBlock.y = getTargetY(activeBlock);
-        
-        // 완전히 굳게 만드는 lockBlock()을 실행하지 않고,
-        // 대신 타이머를 0으로 초기화하여 1.5초를 온전히 벌어줍니다.
         lockTimer = 0; 
     }
 
@@ -499,7 +498,7 @@
         let timeElapsed = Date.now() - touchStartTime;
         
         if (dy > 40 && Math.abs(dy) > Math.abs(dx)) {
-            hardDrop(); // 🌟 수정된 하드 드롭 호출 (1.5초 유예)
+            hardDrop(); 
         }
         else if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && timeElapsed < 300) {
             rotate();
