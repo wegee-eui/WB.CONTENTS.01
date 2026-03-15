@@ -50,20 +50,18 @@
             z-index: 10;
         }
         
-        /* 🌟 가로 스크롤/줄바꿈 완벽 차단 및 가운데 정렬 */
         #block-selector {
             display: flex;
-            flex-wrap: nowrap; /* 한 줄로 강제 고정 */
-            justify-content: center; /* 가운데 정렬 */
+            flex-wrap: nowrap; 
+            justify-content: center; 
             align-items: center;
-            gap: min(12px, 2vw); /* 화면이 좁아지면 간격도 유연하게 줄어듦 */
+            gap: min(12px, 2vw); 
             padding: 0 10px;
             width: 100%;
             box-sizing: border-box;
-            overflow: hidden; /* 영역 밖으로 나가는 스와이프 완전 차단 */
+            overflow: hidden; 
         }
         .block-btn {
-            /* 🌟 모바일 화면에 맞춰 버튼 크기 자동 축소 (최소 35px ~ 최대 55px) */
             width: clamp(35px, 14vw, 55px);
             height: clamp(35px, 14vw, 55px);
             border: 2px solid #eaeaea;
@@ -72,7 +70,7 @@
             background-position: center;
             cursor: pointer;
             transition: all 0.2s ease;
-            flex-shrink: 1; /* 화면이 좁을 경우 줄어드는 것을 허용 */
+            flex-shrink: 1; 
             background-color: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             -webkit-tap-highlight-color: transparent; 
@@ -175,10 +173,14 @@
 
     const keys = { left: false, right: false, down: false };
 
+    // 🌟 수정된 에셋 로딩 로직 (비동기 순서 섞임 방지)
     function loadAssets() {
         const settingsDiv = document.getElementById('block-settings');
         const imgElements = settingsDiv.querySelectorAll('img');
         let loadedCount = 0;
+
+        // 배열의 길이를 미리 지정하여 순서를 강제 고정합니다.
+        SHAPES = new Array(imgElements.length);
 
         imgElements.forEach((imgEl, index) => {
             const w = parseFloat(imgEl.getAttribute('data-w'));
@@ -188,28 +190,34 @@
             const img = new Image();
             img.crossOrigin = "anonymous"; 
             img.src = src;
-            img.onload = () => checkLoadComplete();
-            img.onerror = () => checkLoadComplete();
-
-            function checkLoadComplete() {
-                loadedCount++;
-                SHAPES.push({ origW: w, origH: h, img: img });
-                
-                const btn = document.createElement('button');
-                btn.className = 'block-btn';
-                btn.style.backgroundImage = `url(${src})`;
-                btn.onclick = () => spawnBlock(index);
-                blockSelector.appendChild(btn);
-                
-                if (loadedCount === imgElements.length) {
-                    loadingScreen.style.display = 'none';
-                    canvas.style.display = 'block';
-                    blockPanel.style.display = 'flex'; 
-                    resizeCanvas();
-                    requestAnimationFrame(gameLoop);
-                }
-            }
+            
+            // 로딩 성공 여부와 상관없이 무조건 해당 인덱스(index) 자리에 등록되게 합니다.
+            img.onload = () => handleLoad(index, w, h, img, src);
+            img.onerror = () => handleLoad(index, w, h, img, src);
         });
+
+        function handleLoad(index, w, h, img, src) {
+            // PUSH 대신 인덱스를 직접 지정하여 섞이지 않게 저장
+            SHAPES[index] = { origW: w, origH: h, img: img, src: src };
+            loadedCount++;
+            
+            // 모든 이미지가 로딩 완료된 시점에 한 번에 버튼을 순서대로 생성
+            if (loadedCount === imgElements.length) {
+                SHAPES.forEach((shape, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'block-btn';
+                    btn.style.backgroundImage = `url(${shape.src})`;
+                    btn.onclick = () => spawnBlock(i);
+                    blockSelector.appendChild(btn);
+                });
+
+                loadingScreen.style.display = 'none';
+                canvas.style.display = 'block';
+                blockPanel.style.display = 'flex'; 
+                resizeCanvas();
+                requestAnimationFrame(gameLoop);
+            }
+        }
     }
 
     function resizeCanvas() {
