@@ -3,133 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Precision Physics Builder</title>
+    <title>Responsive Pattern Builder</title>
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa; /* 캔버스가 돋보이도록 배경은 아주 옅은 회색 */
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden; 
         }
         #game-container {
             position: relative;
+            width: 100vw;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
         canvas {
-            background-color: #ffffff;
-            border: 1px solid #eaeaea;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08); /* 그림자를 부드럽고 옅게 변경 */
+            position: absolute;
+            top: 0; left: 0;
+            display: block;
             touch-action: none;
         }
         #loading-screen {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            z-index: 5;
             font-size: 14px;
             letter-spacing: 2px;
             color: #aaa;
         }
-        /* 미니멀한 화이트톤 UI 스타일 */
-        #ui-tools {
+        
+        #toggle-blocks-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        #ui-tools label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #555;
-            cursor: pointer;
-        }
-        input[type="color"] {
-            -webkit-appearance: none;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 28px;
+            background: #111;
+            color: #fff;
             border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
             cursor: pointer;
-            padding: 0;
-            background: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 15;
+            transition: all 0.2s ease;
         }
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
+        #toggle-blocks-btn:hover {
+            transform: translateX(-50%) scale(1.05);
         }
-        input[type="color"]::-webkit-color-swatch {
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+        #toggle-blocks-btn.active {
+            background: #ffffff;
+            color: #111;
+            border: 1px solid #ddd;
         }
+
+        #block-selector {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: none; 
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 90%;
+            overflow-x: auto;
+        }
+        .block-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #eaeaea;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            background-color: #fff;
+        }
+        .block-btn:hover {
+            transform: translateY(-3px);
+            border-color: #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .block-btn:active {
+            transform: translateY(1px);
+        }
+
+        #game-over-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            gap: 15px;
+        }
+        .overlay-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 10px;
+        }
+        .action-btn {
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 200px;
+            letter-spacing: 0.5px;
+        }
+        #download-btn { background: #111; color: white; }
+        #download-btn:hover { background: #333; transform: scale(1.02); }
+        #retry-btn { background: #f0f0f0; color: #333; }
+        #retry-btn:hover { background: #e0e0e0; transform: scale(1.02); }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div id="loading-screen">LOADING...</div>
+    <canvas id="gameCanvas" style="display: none;" data-fall-speed="2.5" data-move-speed="10"></canvas>
     
-    <div id="ui-tools" style="display: none;">
-        <label for="bgColorPicker">BACKGROUND</label>
-        <input type="color" id="bgColorPicker" value="#ffffff">
-    </div>
+    <button id="toggle-blocks-btn" style="display: none;">BLOCKS</button>
+    <div id="block-selector"></div>
 
-    <canvas id="gameCanvas" style="display: none;" data-fall-speed="4" data-move-speed="15" data-bg-color="#ffffff"></canvas>
+    <div id="game-over-overlay" style="display: none;">
+        <div class="overlay-title">Pattern Completed</div>
+        <button id="download-btn" class="action-btn">Download Image</button>
+        <button id="retry-btn" class="action-btn">Retry</button>
+    </div>
 </div>
 
 <div id="block-settings" style="display: none;">
-    <img data-w="4" data-h="4" src="image/01T.png" alt="4:4">
-    <img data-w="2" data-h="2" src="image/05T.png" alt="2:2">
-    <img data-w="6" data-h="2.5" src="image/03T.png" alt="6:2.5">
-    <img data-w="6" data-h="3.3" src="image/04T.png" alt="6:3.3">
-    <img data-w="4.3" data-h="2" src="image/02T.png" alt="4.3:2">
-
+    <img data-w="2" data-h="2" src="01T.png" alt="2:2">
+    <img data-w="1" data-h="1" src="05T.png" alt="1:1">
+    <img data-w="6" data-h="1" src="03T.png" alt="6:1">
+    <img data-w="3" data-h="2" src="04T.png" alt="3:2">
+    <img data-w="2" data-h="1" src="02T.png" alt="2:1">
+    <img data-w="3" data-h="1.5" src="06T.png" alt="3:1.5">
 </div>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const loadingScreen = document.getElementById('loading-screen');
-    const uiTools = document.getElementById('ui-tools');
-    const colorPicker = document.getElementById('bgColorPicker');
+    const blockSelector = document.getElementById('block-selector');
+    const toggleBlocksBtn = document.getElementById('toggle-blocks-btn');
+    const gameOverOverlay = document.getElementById('game-over-overlay');
     
-    let fallSpeed = parseFloat(canvas.getAttribute('data-fall-speed')) || 4;
-    let moveSpeed = parseFloat(canvas.getAttribute('data-move-speed')) || 15;
+    let fallSpeed = parseFloat(canvas.getAttribute('data-fall-speed')) || 2.5;
+    let moveSpeed = parseFloat(canvas.getAttribute('data-move-speed')) || 10;
     
-    // 기본 배경색 설정
-    let currentBgColor = canvas.getAttribute('data-bg-color') || '#ffffff';
-    colorPicker.value = currentBgColor; 
-
-    colorPicker.addEventListener('input', (e) => {
-        currentBgColor = e.target.value;
-        canvas.setAttribute('data-bg-color', currentBgColor);
-    });
-    
-    const COLS = 30; 
-    const ROWS = 60; 
-    let BLOCK_SIZE = 0;
+    let BLOCK_SIZE = 0; 
+    let COLS = 0; 
+    let CSS_WIDTH = 0;
+    let CSS_HEIGHT = 0;
 
     let SHAPES = [];
     let lockedBlocks = [];
     let activeBlock = null;
     let lastTime = 0;
+    let isGameOver = false;
+    let isSelectorOpen = false;
     
     const keys = { left: false, right: false, down: false };
 
@@ -138,12 +191,13 @@
         const imgElements = settingsDiv.querySelectorAll('img');
         let loadedCount = 0;
 
-        imgElements.forEach(imgEl => {
+        imgElements.forEach((imgEl, index) => {
             const w = parseFloat(imgEl.getAttribute('data-w'));
             const h = parseFloat(imgEl.getAttribute('data-h'));
             const src = imgEl.getAttribute('src');
 
             const img = new Image();
+            img.crossOrigin = "anonymous"; 
             img.src = src;
             img.onload = () => checkLoadComplete();
             img.onerror = () => checkLoadComplete();
@@ -152,72 +206,124 @@
                 loadedCount++;
                 SHAPES.push({ origW: w, origH: h, img: img });
                 
+                const btn = document.createElement('button');
+                btn.className = 'block-btn';
+                btn.style.backgroundImage = `url(${src})`;
+                btn.onclick = () => spawnBlock(index); // 버튼 클릭 시 블록 변경 로직 호출
+                blockSelector.appendChild(btn);
+                
                 if (loadedCount === imgElements.length) {
                     loadingScreen.style.display = 'none';
                     canvas.style.display = 'block';
-                    uiTools.style.display = 'flex';
+                    toggleBlocksBtn.style.display = 'block'; 
                     resizeCanvas();
-                    spawnBlock();
                     requestAnimationFrame(gameLoop);
                 }
             }
         });
     }
 
+    toggleBlocksBtn.addEventListener('click', () => {
+        isSelectorOpen = !isSelectorOpen;
+        if (isSelectorOpen) {
+            blockSelector.style.display = 'flex';
+            toggleBlocksBtn.innerText = '⬇ CLOSE';
+            toggleBlocksBtn.classList.add('active');
+        } else {
+            blockSelector.style.display = 'none';
+            toggleBlocksBtn.innerText = 'BLOCKS';
+            toggleBlocksBtn.classList.remove('active');
+        }
+    });
+
     function resizeCanvas() {
-        const maxWidth = window.innerWidth * 0.95;
-        const maxHeight = window.innerHeight * 0.95;
-        BLOCK_SIZE = Math.min(maxWidth / COLS, maxHeight / ROWS);
-        canvas.width = BLOCK_SIZE * COLS;
-        canvas.height = BLOCK_SIZE * ROWS;
+        CSS_WIDTH = window.innerWidth;
+        CSS_HEIGHT = window.innerHeight;
+        
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = CSS_WIDTH * dpr;
+        canvas.height = CSS_HEIGHT * dpr;
+        canvas.style.width = CSS_WIDTH + 'px';
+        canvas.style.height = CSS_HEIGHT + 'px';
+        ctx.scale(dpr, dpr);
+        
+        BLOCK_SIZE = Math.min(CSS_WIDTH, CSS_HEIGHT) / 25; 
+        COLS = CSS_WIDTH / BLOCK_SIZE; 
+
         draw();
     }
     window.addEventListener('resize', resizeCanvas);
 
-    function spawnBlock() {
-        const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-        activeBlock = {
-            x: Math.floor(COLS / 2) - Math.floor(shape.origW / 2),
-            y: -shape.origH, 
-            w: shape.origW,
-            h: shape.origH,
-            origW: shape.origW,
-            origH: shape.origH,
-            img: shape.img,
-            rotated: false
-        };
+    // 💡 변경된 핵심 로직: 블록 교체 기능
+    function spawnBlock(index) {
+        if (isGameOver) return; 
 
-        if (getTargetY(activeBlock) <= 0) lockedBlocks = []; 
+        const shape = SHAPES[index];
+
+        if (activeBlock) {
+            // 이미 떨어지고 있는 블록이 있다면, 그 자리에서 형태와 이미지만 변경합니다.
+            activeBlock.w = shape.origW;
+            activeBlock.h = shape.origH;
+            activeBlock.origW = shape.origW;
+            activeBlock.origH = shape.origH;
+            activeBlock.img = shape.img;
+            activeBlock.rotated = false; // 회전 상태는 초기화
+
+            // 모양이 변경되면서 오른쪽 화면 밖으로 나가는 경우 벽 안으로 밀어 넣기
+            if (activeBlock.x + activeBlock.w > COLS) {
+                activeBlock.x = COLS - activeBlock.w;
+            }
+            
+            // 모양이 커지면서 바닥(또는 쌓인 블록) 아래로 파고들었다면 위치 보정
+            const targetY = getTargetY(activeBlock);
+            if (activeBlock.y < targetY) {
+                activeBlock.y = targetY;
+            }
+
+        } else {
+            // 떨어지는 블록이 없을 때는 화면 꼭대기에서 새롭게 생성
+            activeBlock = {
+                x: (COLS / 2) - (shape.origW / 2),
+                y: CSS_HEIGHT / BLOCK_SIZE,
+                w: shape.origW,
+                h: shape.origH,
+                origW: shape.origW,
+                origH: shape.origH,
+                img: shape.img,
+                rotated: false
+            };
+
+            const targetY = getTargetY(activeBlock);
+            if (targetY + activeBlock.h >= CSS_HEIGHT / BLOCK_SIZE) {
+                activeBlock = null; 
+                showGameOver();
+            }
+        }
     }
 
     function getTargetX(block, dx) {
         let newX = block.x + dx;
         const eps = 0.001;
-        
         if (newX < 0) newX = 0;
         if (newX + block.w > COLS) newX = COLS - block.w;
-
+        
         for (let b of lockedBlocks) {
-            if (block.y + block.h - eps > b.y && block.y + eps < b.y + b.h) {
-                if (dx > 0) {
-                    if (block.x + block.w <= b.x + eps && newX + block.w > b.x) newX = b.x - block.w; 
-                } else if (dx < 0) {
-                    if (block.x >= b.x + b.w - eps && newX < b.x + b.w) newX = b.x + b.w; 
-                }
+            if (block.y + eps < b.y + b.h && block.y + block.h - eps > b.y) {
+                if (dx > 0) { if (block.x + block.w <= b.x + eps && newX + block.w > b.x) newX = b.x - block.w; } 
+                else if (dx < 0) { if (block.x >= b.x + b.w - eps && newX < b.x + b.w) newX = b.x + b.w; }
             }
         }
         return newX;
     }
 
     function getTargetY(block) {
-        let maxAllowedY = ROWS - block.h; 
+        let maxAllowedY = 0; 
         const eps = 0.001; 
-
         for (let b of lockedBlocks) {
             if (block.x + eps < b.x + b.w && block.x + block.w - eps > b.x) {
-                if (b.y >= block.y - eps) {
-                    let potentialY = b.y - block.h;
-                    if (potentialY < maxAllowedY) maxAllowedY = potentialY; 
+                if (b.y + b.h <= block.y + eps) {
+                    let potentialY = b.y + b.h;
+                    if (potentialY > maxAllowedY) maxAllowedY = potentialY; 
                 }
             }
         }
@@ -226,8 +332,6 @@
 
     function isValidRotation(newW, newH) {
         if (activeBlock.x < 0 || activeBlock.x + newW > COLS) return false;
-        if (activeBlock.y + newH > ROWS) return false;
-
         const eps = 0.001;
         for (let b of lockedBlocks) {
             if (activeBlock.x + eps < b.x + b.w && activeBlock.x + newW - eps > b.x &&
@@ -241,26 +345,30 @@
     function lockBlock() {
         lockedBlocks.push({...activeBlock});
         activeBlock = null;
-        spawnBlock();
     }
 
     function draw() {
-        ctx.fillStyle = currentBgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff'; 
+        ctx.fillRect(0, 0, CSS_WIDTH, CSS_HEIGHT);
 
-        // 화이트 배경에 맞춘 아주 연하고 고급스러운 톤의 그리드 라인
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.04)';
         ctx.lineWidth = 1;
-        for(let i=0; i<=COLS; i++) { ctx.beginPath(); ctx.moveTo(i*BLOCK_SIZE, 0); ctx.lineTo(i*BLOCK_SIZE, canvas.height); ctx.stroke(); }
-        for(let j=0; j<=ROWS; j++) { ctx.beginPath(); ctx.moveTo(0, j*BLOCK_SIZE); ctx.lineTo(canvas.width, j*BLOCK_SIZE); ctx.stroke(); }
+        
+        for(let i=0; i<=Math.ceil(COLS); i++) { 
+            ctx.beginPath(); ctx.moveTo(i*BLOCK_SIZE, 0); ctx.lineTo(i*BLOCK_SIZE, CSS_HEIGHT); ctx.stroke(); 
+        }
+        for(let i=0; i*BLOCK_SIZE <= CSS_HEIGHT; i++) {
+            const lineY = CSS_HEIGHT - i*BLOCK_SIZE;
+            ctx.beginPath(); ctx.moveTo(0, lineY); ctx.lineTo(CSS_WIDTH, lineY); ctx.stroke();
+        }
 
         lockedBlocks.forEach(renderBlock);
 
-        if (activeBlock) {
+        if (activeBlock && !isGameOver) {
             const targetY = getTargetY(activeBlock);
-            if (targetY > activeBlock.y) {
+            if (targetY < activeBlock.y) {
                 ctx.save();
-                ctx.globalAlpha = 0.3; 
+                ctx.globalAlpha = 0.25; 
                 const ghostBlock = { ...activeBlock, y: targetY };
                 renderBlock(ghostBlock);
                 ctx.restore();
@@ -271,7 +379,10 @@
 
     function renderBlock(block) {
         ctx.save();
-        ctx.translate((block.x + block.w/2) * BLOCK_SIZE, (block.y + block.h/2) * BLOCK_SIZE);
+        const pixelX = (block.x + block.w/2) * BLOCK_SIZE;
+        const pixelY = CSS_HEIGHT - (block.y + block.h/2) * BLOCK_SIZE;
+        
+        ctx.translate(pixelX, pixelY);
         if (block.rotated) {
             ctx.rotate(Math.PI / 2);
             ctx.drawImage(block.img, -block.origW/2 * BLOCK_SIZE, -block.origH/2 * BLOCK_SIZE, block.origW * BLOCK_SIZE, block.origH * BLOCK_SIZE);
@@ -286,16 +397,10 @@
         const deltaTime = (time - lastTime) / 1000; 
         lastTime = time;
 
-        fallSpeed = parseFloat(canvas.getAttribute('data-fall-speed')) || 4;
-        moveSpeed = parseFloat(canvas.getAttribute('data-move-speed')) || 15;
+        fallSpeed = parseFloat(canvas.getAttribute('data-fall-speed')) || 5;
+        moveSpeed = parseFloat(canvas.getAttribute('data-move-speed')) || 20;
 
-        const htmlBgColor = canvas.getAttribute('data-bg-color');
-        if(htmlBgColor !== currentBgColor && document.activeElement !== colorPicker) {
-            currentBgColor = htmlBgColor;
-            colorPicker.value = currentBgColor;
-        }
-
-        if (activeBlock) {
+        if (activeBlock && !isGameOver) {
             let dx = 0;
             if (keys.left) dx -= moveSpeed * deltaTime;
             if (keys.right) dx += moveSpeed * deltaTime;
@@ -303,9 +408,10 @@
 
             let currentFallSpeed = keys.down ? fallSpeed * 4 : fallSpeed;
             let targetY = getTargetY(activeBlock);
-            activeBlock.y += currentFallSpeed * deltaTime;
+            
+            activeBlock.y -= currentFallSpeed * deltaTime;
 
-            if (activeBlock.y >= targetY) {
+            if (activeBlock.y <= targetY) {
                 activeBlock.y = targetY; 
                 lockBlock();
             }
@@ -316,23 +422,58 @@
     }
 
     function rotate() {
-        if (!activeBlock) return;
+        if (!activeBlock || isGameOver) return;
         const newW = activeBlock.h;
         const newH = activeBlock.w;
         if (isValidRotation(newW, newH)) {
             activeBlock.w = newW;
             activeBlock.h = newH;
             activeBlock.rotated = !activeBlock.rotated;
+            
+            const targetY = getTargetY(activeBlock);
+            if (activeBlock.y < targetY) activeBlock.y = targetY; 
         }
     }
 
     function hardDrop() {
-        if (!activeBlock) return;
+        if (!activeBlock || isGameOver) return;
         activeBlock.y = getTargetY(activeBlock);
         lockBlock();
     }
 
+    function showGameOver() {
+        isGameOver = true;
+        gameOverOverlay.style.display = 'flex';
+        blockSelector.style.display = 'none';
+        toggleBlocksBtn.style.display = 'none';
+        isSelectorOpen = false;
+    }
+
+    document.getElementById('retry-btn').addEventListener('click', () => {
+        lockedBlocks = [];
+        isGameOver = false;
+        gameOverOverlay.style.display = 'none';
+        toggleBlocksBtn.style.display = 'block';
+        toggleBlocksBtn.innerText = '🧱 BLOCKS';
+        toggleBlocksBtn.classList.remove('active');
+        draw();
+    });
+
+    document.getElementById('download-btn').addEventListener('click', () => {
+        draw(); 
+        try {
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'my-pattern-design.png';
+            link.href = dataURL;
+            link.click();
+        } catch (e) {
+            alert("외부 이미지 서버의 보안 정책(CORS)으로 인해 다운로드가 차단되었습니다. 로컬 경로의 이미지를 사용하시면 정상 작동합니다.");
+        }
+    });
+
     document.addEventListener('keydown', e => {
+        if (isGameOver) return;
         if (e.code === 'ArrowLeft') keys.left = true;
         if (e.code === 'ArrowRight') keys.right = true;
         if (e.code === 'ArrowDown') keys.down = true;
@@ -351,17 +492,16 @@
     let touchStartTime = 0;
 
     canvas.addEventListener('touchstart', e => {
-        if(e.target === colorPicker || e.target.tagName === 'LABEL') return;
-        
-        touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
+        if(isGameOver || e.target.closest('#block-selector') || e.target.id === 'toggle-blocks-btn') return;
+        touchStartX = e.changedTouches[0].clientX; 
+        touchStartY = e.changedTouches[0].clientY;
         lastTouchX = touchStartX;
         touchStartTime = Date.now();
     }, { passive: false });
 
     canvas.addEventListener('touchmove', e => {
-        if (!activeBlock || e.target === colorPicker || e.target.tagName === 'LABEL') return;
-        let currentTouchX = e.changedTouches[0].screenX;
+        if (!activeBlock || isGameOver || e.target.closest('#block-selector')) return;
+        let currentTouchX = e.changedTouches[0].clientX;
         let dxPixels = currentTouchX - lastTouchX;
         let dxUnits = (dxPixels / BLOCK_SIZE) * 1.5; 
         
@@ -372,9 +512,9 @@
     }, { passive: false });
 
     canvas.addEventListener('touchend', e => {
-        if (!activeBlock || e.target === colorPicker || e.target.tagName === 'LABEL') return;
-        let touchEndX = e.changedTouches[0].screenX;
-        let touchEndY = e.changedTouches[0].screenY;
+        if (!activeBlock || isGameOver || e.target.closest('#block-selector')) return;
+        let touchEndX = e.changedTouches[0].clientX;
+        let touchEndY = e.changedTouches[0].clientY;
         
         let dx = touchEndX - touchStartX;
         let dy = touchEndY - touchStartY;
